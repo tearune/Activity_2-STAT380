@@ -1,0 +1,18 @@
+---
+title: "Activity2"
+author: "Ankita Bhattacharyya and Zhan Wang"
+format: html
+editor: visual
+---
+
+## Introduction and Background
+
+-
+
+## Data Exploration
+-
+
+## Modeling Methods
+-
+
+## Results
