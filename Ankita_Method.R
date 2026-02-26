@@ -6,7 +6,7 @@ library(caret)
 insurance_data <- read.csv("insurance_data_S26.csv")
 View(insurance_data)
 
-#Cross Validation (80-20 split)
+# Cross Validation (80-20 split) - 
 
 set.seed(550)
 train_index <- sample(
@@ -17,4 +17,17 @@ train_index <- sample(
 insuranceTrain <- insurance_data[train_index, ]
 insuranceValid <- insurance_data[-train_index, ]
 
-insuranceTrainModel <- 
+insuranceTrainModel <- lm(
+  formula = charges ~ age + children,
+  data = insuranceTrain
+)
+
+insuranceValid <- insuranceValid %>%
+  mutate(
+    model1_predict = predict(
+      object = insuranceTrainModel,
+      newdata = insuranceValid
+    )
+  )
+  
+summary(insuranceTrainModel)
