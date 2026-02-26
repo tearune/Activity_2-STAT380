@@ -13,7 +13,11 @@ editor: visual
 -
 
 ## Modeling Methods
+<<<<<<< HEAD
 
 # Method One: Foward Subset Selection Algorithm
+=======
+-
+>>>>>>> 1f4a19a0d6650b47412cda395ca10233a74af912
 
 ## Results
