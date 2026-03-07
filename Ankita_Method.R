@@ -59,3 +59,16 @@ summary(FORWARD_AIC)
 #' r^2 adjusted = 0.7239
 
 #BACKWARD BIC
+stats::step(
+  object = full_insurance,
+  data = insurance_data,
+  direction = "backward",
+  k = log(nrow(insurance_data)),
+  trace = 1
+)
+
+BACKWARDS_BIC <- lm(charges~age+bmi+children+smoker, data = insurance_data)
+summary(BACKWARDS_BIC)
+#'r^2 = 0.72, adj-r^2 = 0.72
+#' all predictors are significant
+#' check assumptions
