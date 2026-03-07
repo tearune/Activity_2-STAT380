@@ -31,3 +31,31 @@ insuranceValid <- insuranceValid %>%
   )
   
 summary(insuranceTrainModel)
+
+
+#FORWARD SELECTION (AIC)
+null_insurance <- lm(
+  charges ~ 1,
+  data = insurance_data
+)
+
+full_insurance <-lm(
+  charges ~ .,
+  data = insurance_data
+)
+
+stats::step(
+  object = null_insurance,
+  scope = list(lower = null_insurance, upper = full_insurance),
+  data = insurance_data,
+  direction = 'forward'
+)
+
+FORWARD_AIC <- lm(charges~smoker+age+bmi+region+children+priorclaims+month, data = insurance_data)
+summary(FORWARD_AIC) 
+#thoughts?
+#' remove priorclaims, moth and region <- not significant
+#' check for assumptions
+#' r^2 adjusted = 0.7239
+
+#BACKWARD BIC
