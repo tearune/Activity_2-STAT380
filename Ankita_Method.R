@@ -18,7 +18,7 @@ insuranceTrain <- insurance_data[train_index, ]
 insuranceValid <- insurance_data[-train_index, ]
 
 insuranceTrainModel <- lm(
-  formula = charges ~ .,
+  formula = charges ~ smoker+age+bmi+children+priorclaims,
   data = insuranceTrain
 )
 
@@ -29,8 +29,6 @@ insuranceValid <- insuranceValid %>%
       newdata = insuranceValid
     )
   )
-  
-summary(insuranceTrainModel)
 
 
 #FORWARD SELECTION (AIC)
@@ -51,7 +49,7 @@ stats::step(
   direction = 'forward'
 )
 
-FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
+FORWARD_AIC <- lm(sqrt(charges)~smoker+age+bmi+children+priorclaims, data = insurance_data)
 summary(FORWARD_AIC) 
 plot(FORWARD_AIC)
 

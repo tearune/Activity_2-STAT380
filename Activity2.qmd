@@ -6,7 +6,7 @@ editor: visual
 ---
 
 # Introduction and Background
-The goal of this analysis is to be able to find the best model, using different variable searching algorithms, to predict price of charges from predictors in the insurance data set. To be able to find the best model, we will be testing three different variable selection methods: Forward sub-setting, backward sub-setting and lasso regression. After the  
+The goal of this analysis is to be able to find the best model, using different variable searching algorithms, to predict price of charges from predictors in the insurance data set. To be able to find the best model, we will be testing three different variable selection methods: Forward sub-setting, backward sub-setting and lasso regression. After each model is found, to compare which model would be the best for predicting charges, each model will be testing for variations from linearity. As well as, comparing performance indicators between the three models and cross validating to see how each model handles new and unseen data.
 
 
 # Data Exploration
@@ -56,10 +56,47 @@ FORWARD_AIC <- lm(charges~smoker+age+bmi+region+children+priorclaims+month, data
 FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims+month, data = insurance_data)
 FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
 
-#CROSS VALIDATION -----------------------------
-View(insurance_data)
+#plot(FORWARD_AIC) <- looking at the assumptions of linearity
+
+#BACKWARD BIC MODEL ----------------------------------------
+stats::step(
+  object = full_insurance,
+  data = insurance_data,
+  direction = "backward",
+  k = log(nrow(insurance_data)),
+  trace = 1
+)
+
+BACKWARDS_BIC <- lm(charges~age+bmi+children+smoker, data = insurance_data)
+
+
+#CROSS VALIDATION FORWARD AIC -----------------------------
 
 # Cross Validation (80-20 split) - 
+
+set.seed(550)
+train_index <- sample(
+  x = 1:nrow(insurance_data),
+  size = floor(0.8*nrow(insurance_data))
+)
+
+insuranceTrain <- insurance_data[train_index, ]
+insuranceValid <- insurance_data[-train_index, ]
+
+insuranceTrainModel <- lm(
+  formula = charges ~ smoker+age+bmi+children+priorclaims,
+  data = insuranceTrain
+)
+
+insuranceValid <- insuranceValid %>%
+  mutate(
+    model1_predict = predict(
+      object = insuranceTrainModel,
+      newdata = insuranceValid
+    )
+  )
+
+#CROSS VALIDATION BACKWARD BIC -----------------------------
 
 set.seed(550)
 train_index <- sample(
@@ -96,10 +133,18 @@ Once removed the model becomes: $$\hat{charges} = -12154.03 + 22984.80smokeryes 
 
 The resulting model's Adjusted R-squared is 0.7205. 72.05 % of the model's variation in charges is explained by predictors of smoker, age, bmi, children and prior claims.  
 
+For the Backward BIC model, when we did hypothesis tests for significance, all predictors in the model were significant at the 5% level. So no alteration was needed. 
+
 ### Testing Multi-linearity Assumptions
 Checking for departures from linearity in both models. 
 
-For the Forward AIC model, to check linearity and constant error variance.
+For the Forward AIC model, to check linearity and constant error variance, we created a Standardized residuals plot. Look at @fig-AResid . 
+```{r, echo=FALSE}
+#| label: fig-AResid
+
+AResid <- 
+```
+
 
  
 ## Method Two: Lasso Regression
