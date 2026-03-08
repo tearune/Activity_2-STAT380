@@ -38,7 +38,7 @@ To find variables for the model, two subset selection algorithms were used; Forw
 
 The two base models that are being analyzed are:
 
-Forward AIC:
+Forward AIC (Model A):
 ```{r, eval=FALSE, echo=FALSE}
 # Creating Models from Subsetting Algorithms-------------------------------
 library(tidyverse)
@@ -140,29 +140,35 @@ insuranceValid <- insuranceValid %>%
 
 $\hat{charges} = -11437.82 + 23045.34smokeryes + 259.86age + 338.86bmi - 617.69regionnorthwest - 1950.74regionsoutheast - 1512.27regionsouthwest + 528.11children + 346.21priorclaims - 106.75month$
 
-Backward BIC:
+Backward BIC (Model B):
 $$\hat{charges} = -11627.90 + 257.65age + 310.57bmi + 502.99children + 23016.60smokeryes$$
 
 ### Significance of Predictors
 
-When conducting a hypothesis test of significance for each predictor in Forward AIC's model, `region`'s t statistic and p-value when `region` is northwest and all other predictors are constant are -1.013 and 0.31123, respectively. Under a 5% significance level, there isn't enough evidence to say region is a significant enough predictor. The predictor is removed from the model, and the resulting model as: 
+When conducting a hypothesis test of significance for each predictor in Model A, `region`'s t statistic and p-value when `region` is northwest and all other predictors are constant are -1.013 and 0.31123, respectively. Under a 5% significance level, there isn't enough evidence to say region is a significant enough predictor. The predictor is removed from the model, and the resulting model as: 
 $\hat{charges=}-11612.23+22996.69smokeryes+261.46age+305.57bmi+538.87children+359.47priorclaims-95.95months$
 
-Continuing to remove insignificant predictors, when conducting another hypothesis test for significance for each predictor in Forward AIC's model, `month`'s t-statistic and p-value are -1.547 and 0.12216 respectively. Under a 5% significance level, there isn't enough evidence to month is a significant enough predictor.
+Continuing to remove insignificant predictors, when conducting another hypothesis test for significance for each predictor in Model A, `month`'s t-statistic and p-value are -1.547 and 0.12216 respectively. Under a 5% significance level, there isn't enough evidence to month is a significant enough predictor.
 Once removed the model becomes: $$\hat{charges} = -12154.03 + 22984.80smokeryes +260.38age+304.55bmi+530.38children+355.36priorclaims$$
 
-The resulting model's Adjusted R-squared is 0.7205. 72.05 % of the model's variation in charges is explained by predictors of smoker, age, bmi, children and prior claims.  
+For the resulting Model A; 72.05 % of the model's variation in charges is explained by predictors of smoker, age, bmi, children and prior claims.  
 
-For the Backward BIC model, when we did hypothesis tests for significance, all predictors in the model were significant at the 5% level. So no alteration was needed. 
+For Model B, when we did hypothesis tests for significance, all predictors in the model were significant at the 5% level. So no predictors needed to removed.
 
 ### Testing Multi-linearity Assumptions
 Checking for departures from linearity in both models. 
 
-For the Forward AIC model, to check linearity, constant error variance and zero mean, we created a Standardized residuals plot.
+For both models, since our data was taken by random sample, so we can assume that independence assumption has not been violated.
+
+#### Model A Assumptions
+
+For Model A, to check linearity, constant error variance and zero mean, we created a Standardized residuals plot.
 ```{r, echo=FALSE}
 #| label: fig-AResid
 #| fig-cap: "Standardized Residual vs Fitted Values plot for Model A"
 #| fig-pos: "H"
+
+# MODEL A PLOTS --------------------------------------
 insurance_data <- read.csv("insurance_data_S26.csv")
 
 FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
@@ -175,8 +181,41 @@ abline(h=0)
 ```
 The Residual plot shows no apparent curvature and no fanning, so it is safe to assume there are no violations to linearity and there is constant error variance. The majority of points are clustered around the zero mean, with two clusters clearly above and below the zero mean line. So there is a possible violation of zero mean distribution.
 
-Next, to test our 
+Next, to check if our distribution is normal, a quantile-quantile plot is created.
+```{r,echo=FALSE}
+#| label: fig-qqAplot
+#| fig-cap: "Quantile-Quantile plot for Model A"
+#| fig-pos: "H"
+insurance_data <- read.csv("insurance_data_S26.csv")
 
+FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
+
+qqnorm(AResid, pch = 1, col = "cadetblue4")
+qqline(AResid)
+```
+The distribution seems to be heavily right skewed, since the actual values departure from the theoreticals quantities on the right of the graph.
+
+
+### Model B Assumptions
+
+
+To check linearity, constant error variance and zero mean, we created a Standardized residuals plot.
+```{r, echo=FALSE}
+#| label: fig-BResid
+#| fig-cap: "Standardized Residual vs Fitted Values plot for Model B"
+#| fig-pos: "H"
+
+# MODEL A PLOTS --------------------------------------
+insurance_data <- read.csv("insurance_data_S26.csv")
+
+BACKWARDS_BIC <- lm(charges~age+bmi+children+smoker, data = insurance_data)
+
+AResid <- rstandard(FORWARD_AIC)
+AFitted <-FORWARD_AIC$fitted.values
+
+plot(AFitted,AResid, xlab = "Fitted Values", ylab = "Standardized residuals", pch = 16, col = "purple3")
+abline(h=0)
+```
 ### Comparing Performance indicators
 
  
