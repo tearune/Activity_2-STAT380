@@ -119,12 +119,26 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="significance-of-predictors">Significance of Predictors</h3>
 <p>When conducting a hypothesis test of significance for each predictor in Forward AIC’s model, <code>region</code>’s t statistic and p-value when <code>region</code> is northwest and all other predictors are constant are -1.013 and 0.31123, respectively. Under a 5% significance level, there isn’t enough evidence to say region is a significant enough predictor. The predictor is removed from the model, and the resulting model as: <span class="math display">\[\hat{charges=}-11612.23+22996.69smokeryes+261.46age+305.57bmi+538.87children+359.47priorclaims-95.95months\]</span> Continuing to remove insignificant predictors, when conducting another hypothesis test for significance for each predictor in Forward AIC’s model, <code>month</code>’s t-statistic and p-value are -1.547 and 0.12216 respectively. Under a 5% significance level, there isn’t enough evidence to month is a significant enough predictor. Once removed the model becomes: <span class="math display">\[\hat{charges} = -12154.03 + 22984.80smokeryes +260.38age+304.55bmi+530.38children+355.36priorclaims\]</span></p>
 <p>The resulting model’s Adjusted R-squared is 0.7205. 72.05 % of the model’s variation in charges is explained by predictors of smoker, age, bmi, children and prior claims.</p>
-<p>For the Backward BIC model, when we did hypothesis tests for significance, all predictors in the model were significant at the 5% level. So no altercation was needed.</p>
+<p>For the Backward BIC model, when we did hypothesis tests for significance, all predictors in the model were significant at the 5% level. So no alteration was needed.</p>
 </section>
 <section id="testing-multi-linearity-assumptions" class="level3">
 <h3 class="anchored" data-anchor-id="testing-multi-linearity-assumptions">Testing Multi-linearity Assumptions</h3>
 <p>Checking for departures from linearity in both models.</p>
-<p>For the Forward AIC model, to check linearity and constant error variance.</p>
+<p>For the Forward AIC model, to check linearity and constant error variance, we created a Standardized residuals plot. Look at <a href="#fig-AResid" class="quarto-xref">Figure&nbsp;1</a> .</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-AResid" class="quarto-float quarto-figure quarto-figure-center anchored" width="672">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-AResid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Activity2_files/figure-html/fig-AResid-1.png" id="fig-AResid" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-AResid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="method-two-lasso-regression" class="level2">
@@ -236,6 +250,15 @@ insuranceValid &lt;- insuranceValid %&gt;%
       newdata = insuranceValid
     )
   )
+insurance_data &lt;- read.csv("insurance_data_S26.csv")
+
+FORWARD_AIC &lt;- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
+
+AResid &lt;- rstandard(FORWARD_AIC)
+AFitted &lt;-FORWARD_AIC$fitted.values
+
+plot(AFitted,AResid, xlab = "Fitted Values", ylab = "Standardized residuals", pch = 16, col = "purple3")
+abline(h=0)
 </code></pre>
 </div>
 <p>```</p>

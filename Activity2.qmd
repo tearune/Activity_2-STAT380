@@ -1,7 +1,24 @@
 ---
-title: "Activity2"
+title: "Activity 2"
 author: "Ankita Bhattacharyya and Cayla Stevenson"
-format: html
+date: "Mar. 8, 2026"
+date-modified: now
+format: 
+  pdf:
+    embed-resources: true
+    fig-align: center
+    number-depth: 5
+    toc: false
+    link-external-newwindow: true
+    cap-location: top
+    geometry: 
+      - top=1in
+      - left=1in
+      - right=1in
+      - bottom=1in
+execute: 
+  echo: false
+  warning: false
 editor: visual
 ---
 
@@ -121,13 +138,16 @@ insuranceValid <- insuranceValid %>%
   )
 ```
 
-$$\hat{charges} = -11437.82 + 23045.34smokeryes + 259.86age + 338.86bmi - 617.69regionnorthwest - 1950.74regionsoutheast - 1512.27regionsouthwest + 528.11children + 346.21priorclaims - 106.75month$$
+$\hat{charges} = -11437.82 + 23045.34smokeryes + 259.86age + 338.86bmi - 617.69regionnorthwest - 1950.74regionsoutheast - 1512.27regionsouthwest + 528.11children + 346.21priorclaims - 106.75month$
+
 Backward BIC:
 $$\hat{charges} = -11627.90 + 257.65age + 310.57bmi + 502.99children + 23016.60smokeryes$$
 
 ### Significance of Predictors
 
-When conducting a hypothesis test of significance for each predictor in Forward AIC's model, `region`'s t statistic and p-value when `region` is northwest and all other predictors are constant are -1.013 and 0.31123, respectively. Under a 5% significance level, there isn't enough evidence to say region is a significant enough predictor. The predictor is removed from the model, and the resulting model as: $$\hat{charges=}-11612.23+22996.69smokeryes+261.46age+305.57bmi+538.87children+359.47priorclaims-95.95months$$
+When conducting a hypothesis test of significance for each predictor in Forward AIC's model, `region`'s t statistic and p-value when `region` is northwest and all other predictors are constant are -1.013 and 0.31123, respectively. Under a 5% significance level, there isn't enough evidence to say region is a significant enough predictor. The predictor is removed from the model, and the resulting model as: 
+$\hat{charges=}-11612.23+22996.69smokeryes+261.46age+305.57bmi+538.87children+359.47priorclaims-95.95months$
+
 Continuing to remove insignificant predictors, when conducting another hypothesis test for significance for each predictor in Forward AIC's model, `month`'s t-statistic and p-value are -1.547 and 0.12216 respectively. Under a 5% significance level, there isn't enough evidence to month is a significant enough predictor.
 Once removed the model becomes: $$\hat{charges} = -12154.03 + 22984.80smokeryes +260.38age+304.55bmi+530.38children+355.36priorclaims$$
 
@@ -138,20 +158,39 @@ For the Backward BIC model, when we did hypothesis tests for significance, all p
 ### Testing Multi-linearity Assumptions
 Checking for departures from linearity in both models. 
 
-For the Forward AIC model, to check linearity and constant error variance, we created a Standardized residuals plot. Look at @fig-AResid . 
+For the Forward AIC model, to check linearity, constant error variance and zero mean, we created a Standardized residuals plot.
 ```{r, echo=FALSE}
 #| label: fig-AResid
+#| fig-cap: "Standardized Residual vs Fitted Values plot for Model A"
+#| fig-pos: "H"
+insurance_data <- read.csv("insurance_data_S26.csv")
 
-AResid <- 
+FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
+
+AResid <- rstandard(FORWARD_AIC)
+AFitted <-FORWARD_AIC$fitted.values
+
+plot(AFitted,AResid, xlab = "Fitted Values", ylab = "Standardized residuals", pch = 16, col = "purple3")
+abline(h=0)
 ```
+The Residual plot shows no apparent curvature and no fanning, so it is safe to assume there are no violations to linearity and there is constant error variance. The majority of points are clustered around the zero mean, with two clusters clearly above and below the zero mean line. So there is a possible violation of zero mean distribution.
 
+Next, to test our 
+
+### Comparing Performance indicators
 
  
 ## Method Two: Lasso Regression
 
+# Model Chosen and Why
+
 # Final Reccomendations 
+ 
 
 # Author Contributions and Responsibilities 
+### Ankita Bhattacharyya
+
+### Cayla Stevenson
 
 # Code Appendix 
 ```{rcodeAppend, ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
