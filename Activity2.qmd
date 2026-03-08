@@ -23,11 +23,14 @@ editor: visual
 ---
 
 # Introduction and Background
-The goal of this analysis is to be able to find the best model, using different variable searching algorithms, to predict price of charges from predictors in the insurance data set. To be able to find the best model, we will be testing three different variable selection methods: Forward sub-setting, backward sub-setting and lasso regression. After each model is found, to compare which model would be the best for predicting charges, each model will be testing for variations from linearity. As well as, comparing performance indicators between the three models and cross validating to see how each model handles new and unseen data.
+The goal of this analysis to be able to build a predictive model for insurance prices using peoples demographic and characteristics in the "insurance data" dataset. The characteristics in the dataset include variables like age, sex. BMI, number of kids, if they smoke, and more. We used linear regression and other techniques learned in class to find out which variables are most important for insurance price prediction. We also used two different models to complete this task and compare results to determine which one performed the best. The first method we used was subset selection algorithms such as forward selection with AIC and backward selection with BIC. The second method we used was LASSO regression. The goal of this report is to view results and determine which model gives the most reliable predictions of insurance charges.
 
 
 # Data Exploration
 
+The dataset includes information on insurance policy holders and predictors/ characteristics that impact insurance price. The predictor variables include the individuals demographic and characteristics related to health such as age, bmi, number of children, smoking, region, month, and any prior claims the individual may have.
+
+The chosen variables for the dataset were used to locate any patterns that may be associated with the data. We noticed in the dataset that there is a relationship between people that smoke and a higher insurance charge. We also noticed that the BMI variable had some correlation with higher insurance charges meaning that the higher the BMI, the higher the insurance cost possibly because a higher BMI could lead to more health issues or risks. Overall, the main things we noticed is that there are some predictors in the dataset like smoking and BMI that may impact the price of insurance the most.
 
 # Modeling Methods
 
@@ -47,6 +50,9 @@ library(modelr)
 library(caret)
 
 insurance_data <- read.csv("insurance_data_S26.csv")
+
+insurance_data <- insurance_data %>%
+  drop_na()
 
 #FORWARD SELECTION (AIC)----------------------
 null_insurance <- lm(
@@ -87,55 +93,6 @@ stats::step(
 BACKWARDS_BIC <- lm(charges~age+bmi+children+smoker, data = insurance_data)
 
 
-#CROSS VALIDATION FORWARD AIC -----------------------------
-
-# Cross Validation (80-20 split) - 
-
-set.seed(550)
-train_index <- sample(
-  x = 1:nrow(insurance_data),
-  size = floor(0.8*nrow(insurance_data))
-)
-
-insuranceTrain <- insurance_data[train_index, ]
-insuranceValid <- insurance_data[-train_index, ]
-
-insuranceTrainModel <- lm(
-  formula = charges ~ smoker+age+bmi+children+priorclaims,
-  data = insuranceTrain
-)
-
-insuranceValid <- insuranceValid %>%
-  mutate(
-    model1_predict = predict(
-      object = insuranceTrainModel,
-      newdata = insuranceValid
-    )
-  )
-
-#CROSS VALIDATION BACKWARD BIC -----------------------------
-
-set.seed(550)
-train_index <- sample(
-  x = 1:nrow(insurance_data),
-  size = floor(0.8*nrow(insurance_data))
-)
-
-insuranceTrain <- insurance_data[train_index, ]
-insuranceValid <- insurance_data[-train_index, ]
-
-insuranceTrainModel <- lm(
-  formula = charges ~ smoker+age+bmi+children+priorclaims,
-  data = insuranceTrain
-)
-
-insuranceValid <- insuranceValid %>%
-  mutate(
-    model1_predict = predict(
-      object = insuranceTrainModel,
-      newdata = insuranceValid
-    )
-  )
 ```
 
 $\hat{charges} = -11437.82 + 23045.34smokeryes + 259.86age + 338.86bmi - 617.69regionnorthwest - 1950.74regionsoutheast - 1512.27regionsouthwest + 528.11children + 346.21priorclaims - 106.75month$
@@ -169,7 +126,10 @@ For Model A, to check linearity, constant error variance and zero mean, we creat
 #| fig-pos: "H"
 
 # MODEL A PLOTS --------------------------------------
+library(tidyverse)
 insurance_data <- read.csv("insurance_data_S26.csv")
+insurance_data <- insurance_data %>%
+  drop_na()
 
 FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
 
@@ -186,6 +146,8 @@ Next, to check if our distribution is normal, a quantile-quantile plot is create
 #| label: fig-qqAplot
 #| fig-cap: "Quantile-Quantile plot for Model A"
 #| fig-pos: "H"
+
+library(tidyverse)
 insurance_data <- read.csv("insurance_data_S26.csv")
 
 FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
@@ -206,25 +168,191 @@ To check linearity, constant error variance and zero mean, we created a Standard
 #| fig-pos: "H"
 
 # MODEL A PLOTS --------------------------------------
+library(tidyverse)
 insurance_data <- read.csv("insurance_data_S26.csv")
+insurance_data <- insurance_data %>%
+  drop_na()
 
 BACKWARDS_BIC <- lm(charges~age+bmi+children+smoker, data = insurance_data)
 
-AResid <- rstandard(FORWARD_AIC)
-AFitted <-FORWARD_AIC$fitted.values
+BResid <- rstandard(BACKWARDS_BIC)
+BFitted <-BACKWARDS_BIC$fitted.values
 
-plot(AFitted,AResid, xlab = "Fitted Values", ylab = "Standardized residuals", pch = 16, col = "purple3")
+plot(BFitted,BResid, xlab = "Fitted Values", ylab = "Standardized residuals", pch = 16, col = "purple3")
 abline(h=0)
 ```
-### Comparing Performance indicators
+The residual plot shows no apparent curvature and no fanning, so it is safe to assume there are no violations to linearity and there is constant error variance. The majority of points are clustered around the zero mean, with two clusters clearly above and below the zero mean line. So there is a possible violation of zero mean distribution. Almost exactly like Model A.
 
+Next, to check if our distribution is normal, a quantile-quantile plot is created.
+```{r,echo=FALSE}
+#| label: fig-qqBplot
+#| fig-cap: "Quantile-Quantile plot for Model A"
+#| fig-pos: "H"
+
+library(tidyverse)
+insurance_data <- read.csv("insurance_data_S26.csv")
+insurance_data <- insurance_data %>%
+  drop_na()
+
+BACKWARDS_BIC <- lm(charges~age+bmi+children+smoker, data = insurance_data)
+
+qqnorm(BResid, pch = 1, col = "cadetblue4")
+qqline(BResid)
+```
+The distribution seems to be heavily right skewed, since the actual values departure from the theoretical quantities on the right of the graph.
+
+Overall both models look good to use according the assumptions given. 
+
+### Comparing Performance indicators
+```{r}
+
+#CROSS VALIDATION FORWARD AIC -----------------------------
+
+# Cross Validation (80-20 split) - 
+library(modelr)
+
+insurance_data <- insurance_data %>%
+  drop_na()
+
+set.seed(550)
+train_index <- sample(
+  x = 1:nrow(insurance_data),
+  size = floor(0.8*nrow(insurance_data))
+)
+
+insuranceTrain <- insurance_data[train_index, ]
+insuranceValid <- insurance_data[-train_index, ]
+
+insuranceTrainModel <- lm(
+  formula = charges ~ smoker+age+bmi+children+priorclaims,
+  data = insuranceTrain
+)
+
+insuranceValid <- insuranceValid %>%
+  mutate(
+    model1_predict = predict(
+      object = insuranceTrainModel,
+      newdata = insuranceValid
+    )
+  )
+
+MSE_A <- modelr::mse(
+  model = FORWARD_AIC,
+  data = insuranceValid)
+
+RMSE_A <- sqrt(MSE_A)
+#CROSS VALIDATION BACKWARD BIC -----------------------------
+
+set.seed(550)
+train_index <- sample(
+  x = 1:nrow(insurance_data),
+  size = floor(0.8*nrow(insurance_data))
+)
+
+insuranceTrain <- insurance_data[train_index, ]
+insuranceValid <- insurance_data[-train_index, ]
+
+insuranceTrainModel <- lm(
+  formula = charges ~ smoker+age+bmi+children+priorclaims,
+  data = insuranceTrain
+)
+
+insuranceValid <- insuranceValid %>%
+  mutate(
+    model1_predict = predict(
+      object = insuranceTrainModel,
+      newdata = insuranceValid
+    )
+  )
+
+MSE_B <- modelr::mse(
+  model = BACKWARDS_BIC,
+  data = insuranceValid)
+
+RMSE_B <- sqrt(MSE_B)
+
+```
+
+The root mean square error for Model A and Model B are 5218.589 and 5220.996, respectively. The Root Mean Square Error is the average distance between the predicted values and the observed values. We want our Root Mean Square Error to be low, and between the two models Model A has the lower RMSE.
+
+So, between Model A and Model B, I will compare Model A to our Lasso Regression Model.
  
 ## Method Two: Lasso Regression
+The second modeling approach used LASSO regression. LASSO performs variable selection and regularization by shrinking less important regression coefficients toward zero. The predictors with numbers that shrink to zero are then removed from the model. The model was used to look at the variables age, bmi, number of children, smoking, region, month, and any prior claims. The variables that had shrunk to zero were removed from the model and then the model was evaluated and the RMSE was calculated. I used the glmnet package in R to do cross validation.
+
+```{r}
+#LASSO MODEL ---------------------------
+
+library(glmnet)
+library(tidyverse)
+
+insurance_data <- insurance_data %>%
+  drop_na()
+
+train_index <- sample(
+  x = 1:nrow(insurance_data),
+  size = floor(0.8*nrow(insurance_data))
+)
+
+insuranceTrain <- insurance_data[train_index, ]
+insuranceValid <- insurance_data[-train_index, ]
+
+x_train <- model.matrix(charges ~ ., insuranceTrain)[,-1]
+y_train <- insuranceTrain$charges
+
+x_valid <- model.matrix(charges ~ ., insuranceValid)[,-1]
+y_valid <- insuranceValid$charges
+
+
+# running lasso
+set.seed(550)
+
+lasso_cv <- cv.glmnet(
+  x_train,
+  y_train,
+  alpha = 1
+)
+
+#plot(lasso_cv)
+```
+
+The variables retained by the LASSO model included: age, BMI, number of children, smoking, region, month, and prior claims. We removed the predictors/ variables that went to zero and were removed.
+
+# Results
+
+### Initial Results
+
+Initial models used the algorithms with forward selection with AIC and backward selection with BIC. The forward selection produced a model that had multiple predictors of smoking, age, BMI, region, etc. The backward selection resulted in a more simple model that had only age, BMI, number of children, and their smoking status. Both of the models show that smoking had the most impact on the insurance charges. The model proved that people that smoke were predicted to have a higher insurance cost vs non smokers.
+
+### Interpretations
+
+### Model Evaluation
+
+The LASSO model was used with the validation dataset and RMSE was calculated.The RMSE for LASSO was 5225.281 which means that the predicted insurance charges are different than the actual charges. The RMSE gives a measure of the prediction and while some of the predictions may be closer than the actual number, this shows the overall accuracy of the model with this data.
+
+### Refinements
+
+Based on the model selection and evaluation, both models produced reasonable models for predicting insurance charges. The backward BIC model resulted in a simpler and more interpretable model with fewer predictors, while LASSO kept the additional predictors. 
 
 # Model Chosen and Why
 
+When comparing all three model's performance indicator (Root Mean Square Error), the model with the least Root Mean Square Error was Model A, or the Forward AIC model. To test the model one last time, we validated the model with the insurance data validation set. The Root Mean Square error resulting from the last test is 5758.05, meaning the distance between the predicted values and the observed models did increase. However, this doesn't change our thoughts on Model A being the best model for predicting charges.
+```{r}
+library(modelr)
+
+insurance_valid2 <- read.csv("insurance_data_validation_S26.csv")
+
+FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
+
+MSE_A2 <- modelr::mse(
+  model = FORWARD_AIC,
+  data = insurance_valid2)
+
+RMSE_A2 <- sqrt(MSE_A2)
+```
+
 # Final Reccomendations 
- 
+Over all the model we chose to predict charges 
 
 # Author Contributions and Responsibilities 
 ### Ankita Bhattacharyya
