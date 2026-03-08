@@ -1,18 +1,68 @@
 ---
 title: "Activity2"
-author: "Ankita Bhattacharyya and Zhan Wang"
+author: "Ankita Bhattacharyya and Cayla Stevenson"
 format: html
 editor: visual
 ---
 
-## Introduction and Background
+# Introduction and Background
+The goal of this analysis to be able to.
 
--
 
-## Data Exploration
--
+# Data Exploration
 
-## Modeling Methods
--
 
-## Results
+# Modeling Methods
+
+
+## Method One: Subset Selection Algorithms
+
+To find variables for the model, two subset selection algorithms were used; Forward Selection with the performance indicator AIC and Backward Selection with the performance indicator BIC. Each gave difference variables to be included in the model. The backwards selection included fewer predictors than the forward selection did. To select between the two models, we did some further analysis on certain predictors in each model and the checked for violations of multi-linear assumptions.
+
+The two base models that are being analyzed are:
+
+Forward AIC:
+```{r, eval=FALSE, echo=FALSE}
+library(tidyverse)
+library(Hmisc)
+library(modelr)
+library(caret)
+
+insurance_data <- read.csv("insurance_data_S26.csv")
+
+#FORWARD SELECTION (AIC)----------------------
+null_insurance <- lm(
+  charges ~ 1,
+  data = insurance_data
+)
+
+full_insurance <-lm(
+  charges ~ .,
+  data = insurance_data
+)
+
+stats::step(
+  object = null_insurance,
+  scope = list(lower = null_insurance, upper = full_insurance),
+  data = insurance_data,
+  direction = 'forward'
+)
+
+FORWARD_AIC <- lm(charges~smoker+age+bmi+region+children+priorclaims+month, data = insurance_data)
+#--------------------------------------
+```
+
+$$\hat{charges} = -11437.82 + 23045.34smokeryes + 259.86age + 338.86bmi - 617.69regionnorthwest - 1950.74regionsoutheast - 1512.27regionsouthwest + 528.11children + 346.21priorclaims - 106.75month$$
+Backward BIC:
+$$\hat{charges} = -11627.90 + 257.65age + 310.57bmi + 502.99children + 23016.60smokeryes$$
+
+### Significance of Predictors
+ 
+ 
+## Method Two: -
+
+# Final Reccomendations 
+
+# Author Contributions and Responsibilities 
+
+# Code Appendix 
