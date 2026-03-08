@@ -23,6 +23,7 @@ The two base models that are being analyzed are:
 
 Forward AIC:
 ```{r, eval=FALSE, echo=FALSE}
+# Creating Models from Subsetting Algorithms-------------------------------
 library(tidyverse)
 library(Hmisc)
 library(modelr)
@@ -57,12 +58,19 @@ Backward BIC:
 $$\hat{charges} = -11627.90 + 257.65age + 310.57bmi + 502.99children + 23016.60smokeryes$$
 
 ### Significance of Predictors
+When conducting a hypothesis test for each predictor in  
  
- 
-## Method Two: -
+## Method Two: Lasso Regression
 
 # Final Reccomendations 
 
 # Author Contributions and Responsibilities 
 
 # Code Appendix 
+```{rcodeAppend, ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+
+```
+
+
+```
+

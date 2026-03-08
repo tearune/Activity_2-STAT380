@@ -112,15 +112,16 @@ window.Quarto = {
 <section id="method-one-subset-selection-algorithms" class="level2">
 <h2 class="anchored" data-anchor-id="method-one-subset-selection-algorithms">Method One: Subset Selection Algorithms</h2>
 <p>To find variables for the model, two subset selection algorithms were used; Forward Selection with the performance indicator AIC and Backward Selection with the performance indicator BIC. Each gave difference variables to be included in the model. The backwards selection included fewer predictors than the forward selection did. To select between the two models, we did some further analysis on certain predictors in each model and the checked for violations of multi-linear assumptions.</p>
-<p>The two base models that are bing analyzed are:</p>
+<p>The two base models that are being analyzed are:</p>
 <p>Forward AIC:</p>
 <p><span class="math display">\[\hat{charges} = -11437.82 + 23045.34smokeryes + 259.86age + 338.86bmi - 617.69regionnorthwest - 1950.74regionsoutheast - 1512.27regionsouthwest + 528.11children + 346.21priorclaims - 106.75month\]</span> Backward BIC: <span class="math display">\[\hat{charges} = -11627.90 + 257.65age + 310.57bmi + 502.99children + 23016.60smokeryes\]</span></p>
 <section id="significance-of-predictors" class="level3">
 <h3 class="anchored" data-anchor-id="significance-of-predictors">Significance of Predictors</h3>
+<p>When conducting a hypothesis test for each predictor in</p>
 </section>
 </section>
-<section id="method-two--" class="level2">
-<h2 class="anchored" data-anchor-id="method-two--">Method Two: -</h2>
+<section id="method-two-lasso" class="level2">
+<h2 class="anchored" data-anchor-id="method-two-lasso">Method Two: Lasso</h2>
 </section>
 </section>
 <section id="final-reccomendations" class="level1">
@@ -131,6 +132,38 @@ window.Quarto = {
 </section>
 <section id="code-appendix" class="level1">
 <h1>Code Appendix</h1>
+<div class="cell">
+<pre class="rcodeappend cell-code"><code># Creating Models from Subsetting Algorithms-------------------------------
+library(tidyverse)
+library(Hmisc)
+library(modelr)
+library(caret)
+
+insurance_data &lt;- read.csv("insurance_data_S26.csv")
+
+#FORWARD SELECTION (AIC)----------------------
+null_insurance &lt;- lm(
+  charges ~ 1,
+  data = insurance_data
+)
+
+full_insurance &lt;-lm(
+  charges ~ .,
+  data = insurance_data
+)
+
+stats::step(
+  object = null_insurance,
+  scope = list(lower = null_insurance, upper = full_insurance),
+  data = insurance_data,
+  direction = 'forward'
+)
+
+FORWARD_AIC &lt;- lm(charges~smoker+age+bmi+region+children+priorclaims+month, data = insurance_data)
+#--------------------------------------
+</code></pre>
+</div>
+<p>```</p>
 </section>
 
 </main>
