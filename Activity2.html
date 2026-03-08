@@ -117,11 +117,15 @@ window.Quarto = {
 <p><span class="math display">\[\hat{charges} = -11437.82 + 23045.34smokeryes + 259.86age + 338.86bmi - 617.69regionnorthwest - 1950.74regionsoutheast - 1512.27regionsouthwest + 528.11children + 346.21priorclaims - 106.75month\]</span> Backward BIC: <span class="math display">\[\hat{charges} = -11627.90 + 257.65age + 310.57bmi + 502.99children + 23016.60smokeryes\]</span></p>
 <section id="significance-of-predictors" class="level3">
 <h3 class="anchored" data-anchor-id="significance-of-predictors">Significance of Predictors</h3>
-<p>When conducting a hypothesis test for each predictor in</p>
+<p>When conducting a hypothesis test of significance for each predictor in Forward AIC’s model, <code>region</code>’s t statistic and p-value when <code>region</code> is northwest and all other predictors are constant are -1.013 and 0.31123, respectively. Under a 5% significance level, there isn’t enough evidence to say region is a significant enough predictor. The predictor is removed from the model, and the resulting model as: <span class="math display">\[\hat{charges=}-11612.23+22996.69smokeryes+261.46age+305.57bmi+538.87children+359.47priorclaims-95.95months\]</span> Continuing to remove insignificant predictors, when conducting another hypothesis test for significance for each predictor in Forward AIC’s model, <code>month</code>’s t-statistic and p-value are -1.547 and 0.12216 respectively. Under a 5% significance level, there isn’t enough evidence to month is a significant enough predictor. Once removed the model becomes: <span class="math display">\[\hat{charges} = -12154.03 + 22984.80smokeryes +260.38age+304.55bmi+530.38children+355.36priorclaims\]</span></p>
+<p>The resulting model’s Adjusted R-squared is 0.7205. 72.05 % of the model’s variation in charges is explained by predictors of smoker, age, bmi, children and prior claims.</p>
+</section>
+<section id="testing-multi-linearity-assumptions" class="level3">
+<h3 class="anchored" data-anchor-id="testing-multi-linearity-assumptions">Testing Multi-linearity Assumptions</h3>
 </section>
 </section>
-<section id="method-two-lasso" class="level2">
-<h2 class="anchored" data-anchor-id="method-two-lasso">Method Two: Lasso</h2>
+<section id="method-two-lasso-regression" class="level2">
+<h2 class="anchored" data-anchor-id="method-two-lasso-regression">Method Two: Lasso Regression</h2>
 </section>
 </section>
 <section id="final-reccomendations" class="level1">
@@ -161,6 +165,33 @@ stats::step(
 
 FORWARD_AIC &lt;- lm(charges~smoker+age+bmi+region+children+priorclaims+month, data = insurance_data)
 #--------------------------------------
+
+#CROSS VALIDATION -----------------------------
+View(insurance_data)
+
+# Cross Validation (80-20 split) - 
+
+set.seed(550)
+train_index &lt;- sample(
+  x = 1:nrow(insurance_data),
+  size = floor(0.8*nrow(insurance_data))
+)
+
+insuranceTrain &lt;- insurance_data[train_index, ]
+insuranceValid &lt;- insurance_data[-train_index, ]
+
+insuranceTrainModel &lt;- lm(
+  formula = charges ~ .,
+  data = insuranceTrain
+)
+
+insuranceValid &lt;- insuranceValid %&gt;%
+  mutate(
+    model1_predict = predict(
+      object = insuranceTrainModel,
+      newdata = insuranceValid
+    )
+  )
 </code></pre>
 </div>
 <p>```</p>

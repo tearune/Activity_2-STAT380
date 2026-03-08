@@ -18,7 +18,7 @@ insuranceTrain <- insurance_data[train_index, ]
 insuranceValid <- insurance_data[-train_index, ]
 
 insuranceTrainModel <- lm(
-  formula = charges ~ age + children,
+  formula = charges ~ .,
   data = insuranceTrain
 )
 
@@ -51,12 +51,17 @@ stats::step(
   direction = 'forward'
 )
 
-FORWARD_AIC <- lm(charges~smoker+age+bmi+region+children+priorclaims+month, data = insurance_data)
+FORWARD_AIC <- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
 summary(FORWARD_AIC) 
+plot(FORWARD_AIC)
+
+
 #thoughts?
-#' remove priorclaims, moth and region <- not significant
-#' check for assumptions
+#' remove prior claims, moth and region <- not significant
+#' check for assumptions - distribution is not normal heavily right skewed, otherwise is linear, 
+#' constant error variance and no outliers.
 #' r^2 adjusted = 0.7239
+#' --- once removing region, month becomes not significant under 5% rule
 
 #BACKWARD BIC
 stats::step(
@@ -69,6 +74,7 @@ stats::step(
 
 BACKWARDS_BIC <- lm(charges~age+bmi+children+smoker, data = insurance_data)
 summary(BACKWARDS_BIC)
+plot(BACKWARDS_BIC)
 #'r^2 = 0.72, adj-r^2 = 0.72
 #' all predictors are significant
 #' check assumptions
