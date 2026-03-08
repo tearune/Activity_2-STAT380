@@ -102,7 +102,7 @@ window.Quarto = {
 
 <section id="introduction-and-background" class="level1">
 <h1>Introduction and Background</h1>
-<p>The goal of this analysis to be able to.</p>
+<p>The goal of this analysis is to be able to find the best model, using different variable searching algorithms, to predict price of charges from predictors in the insurance data set. To be able to find the best model, we will be testing three different variable selection methods: Forward sub-setting, backward sub-setting and lasso regression. After the</p>
 </section>
 <section id="data-exploration" class="level1">
 <h1>Data Exploration</h1>
@@ -122,6 +122,7 @@ window.Quarto = {
 </section>
 <section id="testing-multi-linearity-assumptions" class="level3">
 <h3 class="anchored" data-anchor-id="testing-multi-linearity-assumptions">Testing Multi-linearity Assumptions</h3>
+<p>Checking for departures from linearity in both models.</p>
 </section>
 </section>
 <section id="method-two-lasso-regression" class="level2">
@@ -164,7 +165,11 @@ stats::step(
 )
 
 FORWARD_AIC &lt;- lm(charges~smoker+age+bmi+region+children+priorclaims+month, data = insurance_data)
-#--------------------------------------
+
+#Testing Significance predictors------------------------------
+#Using terminal output
+FORWARD_AIC &lt;- lm(charges~smoker+age+bmi+children+priorclaims+month, data = insurance_data)
+FORWARD_AIC &lt;- lm(charges~smoker+age+bmi+children+priorclaims, data = insurance_data)
 
 #CROSS VALIDATION -----------------------------
 View(insurance_data)
@@ -181,7 +186,7 @@ insuranceTrain &lt;- insurance_data[train_index, ]
 insuranceValid &lt;- insurance_data[-train_index, ]
 
 insuranceTrainModel &lt;- lm(
-  formula = charges ~ .,
+  formula = charges ~ smoker+age+bmi+children+priorclaims,
   data = insuranceTrain
 )
 

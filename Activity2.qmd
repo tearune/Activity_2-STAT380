@@ -6,7 +6,7 @@ editor: visual
 ---
 
 # Introduction and Background
-The goal of this analysis to be able to.
+The goal of this analysis is to be able to find the best model, using different variable searching algorithms, to predict price of charges from predictors in the insurance data set. To be able to find the best model, we will be testing three different variable selection methods: Forward sub-setting, backward sub-setting and lasso regression. After the  
 
 
 # Data Exploration
@@ -98,6 +98,9 @@ The resulting model's Adjusted R-squared is 0.7205. 72.05 % of the model's varia
 
 ### Testing Multi-linearity Assumptions
 Checking for departures from linearity in both models. 
+
+For the Forward AIC model, to check linearity and constant error variance.
+
  
 ## Method Two: Lasso Regression
 
